@@ -55,7 +55,9 @@ function Dashboard() {
   }, [responses, filterType]);
 
   const avg = (key) => {
-    const vals = filtered.map(r => Number(r[key] || r[key.replace('_', ' ')])).filter(v => v > 0);
+    const keyMap = { q1: 'Q1_Objectives', q2: 'Q2_Relevance', q3: 'Q3_Instructor', q4: 'Q4_Prepared', q5: 'Q5_Recommend' };
+    const lookup = keyMap[key] || key;
+    const vals = filtered.map(r => Number(r[lookup] || r[key])).filter(v => v > 0);
     if (!vals.length) return null;
     return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1);
   };
@@ -212,7 +214,7 @@ function Dashboard() {
                         {r['Overall'] || '—'}
                       </span>
                     </td>
-                    {QUESTIONS.map(q => <td key={q.id} className="ad-mono">{r[q.id] || r[q.id.toUpperCase()] || '—'}</td>)}
+                    {QUESTIONS.map(q => <td key={q.id} className="ad-mono">{r[{q1:'Q1_Objectives',q2:'Q2_Relevance',q3:'Q3_Instructor',q4:'Q4_Prepared',q5:'Q5_Recommend'}[q.id]] || '—'}</td>)}
                     <td className="ad-comment-cell">{r['Comments'] || ''}</td>
                   </tr>
                 ))}
