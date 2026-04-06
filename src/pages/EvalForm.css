@@ -1,17 +1,17 @@
 /* ── Tokens ─────────────────────────────────────────────────────────────── */
 :root {
-  --c-bg: #0d0f10;
-  --c-surface: #161a1d;
-  --c-surface2: #1e2327;
-  --c-border: #2a3038;
-  --c-border2: #3a444e;
-  --c-text: #e8eaec;
-  --c-muted: #7a8894;
-  --c-accent: #f0a500;
-  --c-accent-dim: rgba(240,165,0,0.12);
-  --c-accent-active: #f0a500;
-  --c-danger: #e05252;
-  --c-success: #4caf7d;
+  --c-bg: #f5f5f5;
+  --c-surface: #ffffff;
+  --c-surface2: #eeeeee;
+  --c-border: #ddd;
+  --c-border2: #bbb;
+  --c-text: #1a1a1a;
+  --c-muted: #666;
+  --c-accent: #cc1111;
+  --c-accent-dim: rgba(204,17,17,0.08);
+  --c-accent-active: #cc1111;
+  --c-danger: #cc1111;
+  --c-success: #2a7a4f;
   --r: 4px;
   --font: 'DM Mono', 'Courier New', monospace;
   --font-body: 'IBM Plex Sans', system-ui, sans-serif;
@@ -129,7 +129,7 @@ body {
 }
 
 select.ef-input {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8894' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=...stroke='%23888888'...
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
