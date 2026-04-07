@@ -3,6 +3,19 @@ import { QUESTIONS, ADMIN_PASSWORD, TRAINING_TYPES } from '../config';
 import { fetchResponses } from '../sheets';
 import './Admin.css';
 
+const Q_KEYS = {
+  q1: 'Q1_Objectives',
+  q2: 'Q2_Relevance',
+  q3: 'Q3_Instructor',
+  q4: 'Q4_Prepared',
+  q5: 'Q5_Recommend',
+};
+
+function toNum(val) {
+  const n = parseFloat(val);
+  return isNaN(n) ? 0 : n;
+}
+
 export default function Admin() {
   const [authed, setAuthed] = useState(false);
   const [pw, setPw] = useState('');
@@ -41,7 +54,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterType, setFilterType] = useState('All');
-  const [tab, setTab] = useState('overview'); // overview | responses
+  const [tab, setTab] = useState('overview');
 
   useEffect(() => {
     fetchResponses()
@@ -51,42 +64,38 @@ function Dashboard() {
 
   const filtered = useMemo(() => {
     if (filterType === 'All') return responses;
-    return responses.filter(r => r['Training_Type'] === filterType || r['Training Type'] === filterType);
+    return responses.filter(r => (r['Training_Type'] || r['Training Type']) === filterType);
   }, [responses, filterType]);
 
-  const avg = (key) => {
-    const keyMap = { q1: 'Q1_Objectives', q2: 'Q2_Relevance', q3: 'Q3_Instructor', q4: 'Q4_Prepared', q5: 'Q5_Recommend' };
-    const lookup = keyMap[key] || key;
-    const vals = rows.map(r => parseFloat(getVal(r, key))).filter(v => !isNaN(v) && v > 0);
+  const avgOf = (rows, key) => {
+    const vals = rows.map(r => toNum(r[key])).filter(v => v > 0);
     if (!vals.length) return null;
     return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1);
   };
 
-  const overallAvg = avg('Overall');
-  const questionAvgs = QUESTIONS.map(q => ({
-    ...q,
-    avg: avg(q.id.toUpperCase() + '_' + q.short.replace(/ /g, '_')) || avg(q.id),
-  }));
+  const overallAvg = avgOf(filtered, 'Overall');
 
   const typeBreakdown = useMemo(() => {
     const map = {};
     responses.forEach(r => {
       const t = r['Training_Type'] || r['Training Type'] || 'Unknown';
-      if (!map[t]) map[t] = { count: 0, total: 0 };
+      if (!map[t]) map[t] = { count: 0, total: 0, n: 0 };
       map[t].count++;
-      map[t].total += Number(r['Overall'] || 0);
+      const ov = toNum(r['Overall']);
+      if (ov > 0) { map[t].total += ov; map[t].n++; }
     });
     return Object.entries(map).map(([type, d]) => ({
       type,
       count: d.count,
-      avg: d.total ? (d.total / d.count).toFixed(1) : '—',
+      avg: d.n ? (d.total / d.n).toFixed(1) : '—',
     })).sort((a, b) => b.count - a.count);
   }, [responses]);
 
-  const comments = filtered.filter(r => r['Comments'] && r['Comments'].trim());
+  const comments = filtered.filter(r => r['Comments'] && r['Comments'].toString().trim());
 
   if (loading) return <div className="ad-loading"><div className="ad-spinner" /><span>Loading from Google Sheets…</span></div>;
   if (error) return <div className="ad-error">Error: {error}</div>;
+  if (!responses.length) return <div className="ad-loading"><span>No responses yet. Submit the form to see data here.</span></div>;
 
   return (
     <div className="ad-root">
@@ -112,7 +121,6 @@ function Dashboard() {
 
       {tab === 'overview' && (
         <>
-          {/* KPI strip */}
           <div className="ad-kpi-row">
             <KPI label="Overall avg" value={overallAvg ? `${overallAvg}/5` : '—'} highlight />
             <KPI label="Total responses" value={responses.length} />
@@ -120,19 +128,18 @@ function Dashboard() {
             <KPI label="With comments" value={comments.length} />
           </div>
 
-          {/* Question breakdown */}
           <section className="ad-section">
             <div className="ad-section-label">Question averages</div>
             <div className="ad-q-list">
               {QUESTIONS.map((q, i) => {
-                const a = avg(q.id) || 0;
+                const a = toNum(avgOf(filtered, Q_KEYS[q.id]));
                 const pct = (a / 5) * 100;
                 return (
                   <div key={q.id} className="ad-q-row">
                     <span className="ad-q-num">{String(i + 1).padStart(2, '0')}</span>
                     <span className="ad-q-label">{q.short}</span>
                     <div className="ad-bar-track">
-                      <div className="ad-bar-fill" style={{ width: `${pct}%`, '--pct': pct }} />
+                      <div className="ad-bar-fill" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="ad-q-score">{a ? a.toFixed(1) : '—'}</span>
                   </div>
@@ -141,7 +148,6 @@ function Dashboard() {
             </div>
           </section>
 
-          {/* By training type */}
           <section className="ad-section">
             <div className="ad-section-label">By training type</div>
             <div className="ad-table-wrap">
@@ -159,7 +165,7 @@ function Dashboard() {
                       <td>{row.type}</td>
                       <td>{row.count}</td>
                       <td>
-                        <span className={`ad-score-badge ${Number(row.avg) >= 4 ? 'ad-score-badge--good' : Number(row.avg) >= 3 ? 'ad-score-badge--mid' : 'ad-score-badge--low'}`}>
+                        <span className={`ad-score-badge ${toNum(row.avg) >= 4 ? 'ad-score-badge--good' : toNum(row.avg) >= 3 ? 'ad-score-badge--mid' : 'ad-score-badge--low'}`}>
                           {row.avg}
                         </span>
                       </td>
@@ -170,7 +176,6 @@ function Dashboard() {
             </div>
           </section>
 
-          {/* Comments */}
           {comments.length > 0 && (
             <section className="ad-section">
               <div className="ad-section-label">Written comments ({comments.length})</div>
@@ -199,7 +204,7 @@ function Dashboard() {
                   <th>Type</th>
                   <th>Role</th>
                   <th>Overall</th>
-                  {QUESTIONS.map((q, i) => <th key={q.id}>Q{i+1}</th>)}
+                  {QUESTIONS.map((q, i) => <th key={q.id}>Q{i + 1}</th>)}
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -210,11 +215,13 @@ function Dashboard() {
                     <td>{r['Training_Type'] || r['Training Type'] || '—'}</td>
                     <td>{r['Role'] || '—'}</td>
                     <td>
-                      <span className={`ad-score-badge ${Number(r['Overall']) >= 4 ? 'ad-score-badge--good' : Number(r['Overall']) >= 3 ? 'ad-score-badge--mid' : 'ad-score-badge--low'}`}>
+                      <span className={`ad-score-badge ${toNum(r['Overall']) >= 4 ? 'ad-score-badge--good' : toNum(r['Overall']) >= 3 ? 'ad-score-badge--mid' : 'ad-score-badge--low'}`}>
                         {r['Overall'] || '—'}
                       </span>
                     </td>
-                    {QUESTIONS.map(q => <td key={q.id} className="ad-mono">{r[{q1:'Q1_Objectives',q2:'Q2_Relevance',q3:'Q3_Instructor',q4:'Q4_Prepared',q5:'Q5_Recommend'}[q.id]] || '—'}</td>)}
+                    {QUESTIONS.map(q => (
+                      <td key={q.id} className="ad-mono">{r[Q_KEYS[q.id]] || '—'}</td>
+                    ))}
                     <td className="ad-comment-cell">{r['Comments'] || ''}</td>
                   </tr>
                 ))}
