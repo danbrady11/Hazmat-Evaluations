@@ -45,7 +45,7 @@ export default function EvalForm() {
         <div className="ef-header-badge">HAZMAT</div>
         <div>
           <h1 className="ef-title">Training Evaluation</h1>
-          <p className="ef-subtitle">Your feedback improves program reliability</p>
+          <p className="ef-subtitle">Thank you for helping us improve your hazmat training</p>
         </div>
       </header>
 
