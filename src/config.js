@@ -1,25 +1,18 @@
 // ─── Edit these to match your program ───────────────────────────────────────
 
 export const TRAINING_TYPES = [
-  'Level A Entry Drill',
-  'Level B Entry Drill',
-  'Hazmat CE Drill',
-  'Tabletop Exercise',
-  'Hazmat FRO Class',
-  'Decon Operations Drill',
-  'Chemistry Review',
-  'Equipment Familiarization',
-  'ICS/Command Exercise',
-  'Annual Competency Drill',
-];
+  'CNG in Phoenix',
+  'Sector Responsibilities',
+  'City of Mesa Gas',
+  ];
 
 export const ROLES = [
-  'Hazmat Technician',
-  'Hazmat Operations',
+  'Firefighter',
+  'Engineer',
   'Company Officer',
   'Battalion Chief',
-  'Fire Fighter / First Responder',
-  'Visiting / Outside Agency',
+  'Non-tech',
+  'Industry Partner',
 ];
 
 // ─── Eval questions ──────────────────────────────────────────────────────────
