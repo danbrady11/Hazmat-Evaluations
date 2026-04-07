@@ -57,7 +57,7 @@ function Dashboard() {
   const avg = (key) => {
     const keyMap = { q1: 'Q1_Objectives', q2: 'Q2_Relevance', q3: 'Q3_Instructor', q4: 'Q4_Prepared', q5: 'Q5_Recommend' };
     const lookup = keyMap[key] || key;
-    const vals = filtered.map(r => Number(r[lookup] || r[key])).filter(v => v > 0);
+    const vals = rows.map(r => parseFloat(getVal(r, key))).filter(v => !isNaN(v) && v > 0);
     if (!vals.length) return null;
     return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1);
   };
