@@ -3,7 +3,7 @@
 export const TRAINING_TYPES = [
   'Over the Road',
   'Rail',
-  'Natural Gas (@SW Gas),
+  'Natural Gas (@SW Gas)',
   'CNG in Phoenix',
   'Sector Responsibilities',
   'City of Mesa Gas',
