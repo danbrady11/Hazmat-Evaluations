@@ -1,6 +1,9 @@
 // ─── Edit these to match your program ───────────────────────────────────────
 
 export const TRAINING_TYPES = [
+  'Over the Road',
+  'Rail',
+  'Natural Gas (@SW Gas),
   'CNG in Phoenix',
   'Sector Responsibilities',
   'City of Mesa Gas',
